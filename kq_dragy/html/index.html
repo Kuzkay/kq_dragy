@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="js/jquery.js"></script>
+    <script src="js/chart.js"></script>
+</head>
+<body>
+    <div class="phone">
+        <span class="kq">KuzQuality.com</span>
+        <div class="dragy">
+            <div class="chart">
+                <canvas id="chart" style="width:100%; height: 100%; color: white;"></canvas>
+            </div>
+            <div id="ready" class="ready">Not Ready</div>
+            <div id="times" class="times-container"></div>
+            <span class="hint">Press ▼ to reset</span>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    $(document).ready(() => {
+
+        let ready = false;
+        let times = [];
+
+        window.addEventListener('message', (event) => {
+            if (event.data.event === 'show') {
+                if (event.data.state) {
+                    $('body').fadeIn(400);
+                } else {
+                    $('body').fadeOut(400);
+                }
+            }
+            if (event.data.event === 'speed') {
+                if (times.length > 30) {
+                    times.shift();
+                }
+                times.push({
+                    speed: event.data.speed,
+                    time: event.data.time,
+                });
+                SetChart();
+            }
+            if (event.data.event === 'time') {
+                $('#times').append('<label class="time">0 - ' + event.data.label + ' - ' + event.data.time + 's</label>');
+            }
+            if (event.data.event === 'reset') {
+                setReady(false);
+                reset();
+            }
+            if (event.data.event === 'ready') {
+                setReady(true);
+            }
+        });
+
+
+        function setReady(bool) {
+            ready = bool;
+            if (ready) {
+                $('#ready').html('<span class="yes">Ready</span>')
+            } else {
+                $('#ready').html('<span>Not Ready</span>')
+            }
+        }
+
+        function reset() {
+            $('#times').html('');
+            times = [];
+        }
+
+        function SetChart() {
+            const xValues = times.map(({ speed, time }) => [time]);
+            const data = times.map(({ speed, time }) => [parseInt(speed)]);
+
+            new Chart("chart", {
+                scaleOverride : true,
+                type: "line",
+                data: {
+                    labels: xValues,
+                    datasets: [
+                        {
+                            data,
+                            borderColor: "red",
+                            fill: false
+                        },
+                    ],
+                },
+                options: {
+                    legend: {display: false},
+                    pointRadius: 1,
+                    animation: false,
+                    scales: {
+                        yAxes: [{
+                            display: true,
+                            stacked: true,
+                            ticks: {
+                                fontColor: '#fff',
+                                min: 0, // minimum value
+                                max: round50(Math.max.apply(Math, data) + 50) // maximum value
+                            },
+                            gridLines: {
+                                color: 'rgba(255,255,255,0.4)',
+                            },
+                        }],
+                        xAxes: [{
+                            display: false,
+                        }],
+                    },
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    }
+                },
+            });
+        }
+
+        function round50(num){
+            return Math.ceil(num / 50)*50;
+        }
+    });
+</script>
+
+<style>
+    @font-face {
+        font-family: "FjallaOne";
+        src: url('fonts/FjallaOne.ttf') format('truetype');
+    }
+
+    body {
+        font-family: "FjallaOne", sans-serif !important;
+        font-weight: bold;
+        user-select: none;
+        display: none;
+    }
+
+    .phone {
+        width: 25vh;
+        height: 45vh;
+        position: absolute;
+        right: 5vh;
+        bottom: 5vh;
+        background: rgb(207,207,207);
+        background: linear-gradient(143deg, rgba(207,207,207,1) 0%, rgba(186,186,186,1) 51%, rgba(113,113,113,1) 100%);
+        border-radius: 2vh;
+    }
+
+    .dragy {
+        position: relative;
+        background: rgb(0,78,255);
+        background: linear-gradient(143deg, rgba(0,78,255,1) 0%, rgba(55,156,255,1) 51%, rgba(0,121,255,1) 100%);
+        box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+        border-radius: 0.5vh;
+        width: 92%;
+        height: 92%;
+        margin-left: 3%;
+        margin-top: 5%;
+    }
+
+    .chart {
+        width: 90%;
+        height: 35%;
+        position: absolute;
+        top: 2%;
+    }
+
+
+    .ready {
+        width: 100%;
+        position: absolute;
+        bottom: 57.5%;
+        font-size: 2vh;
+        text-align: center;
+        color: red;
+    }
+
+    .ready .yes {
+        color: lime;
+    }
+
+    .times-container {
+        width: calc(100% - 6vh);
+        height: calc(60% - 6vh);
+        background-color: white;
+        position: absolute;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 1vh;
+        margin: 2vh;
+        border-radius: 0.5vh;
+        box-shadow: 2px 2px 3px rgba(0,0,0,0.25);
+    }
+
+    .time {
+        font-size: 1.75vh;
+        color: rgb(40, 40, 40);
+    }
+
+    .hint {
+        position: absolute;
+        bottom: 2px;
+        color: rgba(255,255,255,0.5);
+        font-size: 1vh;
+        width: 100%;
+        text-align: center;
+    }
+
+    .kq {
+        position: absolute;
+        bottom: 3px;
+        right: 1vh;
+        font-size: 1vh;
+        color: rgba(255,255,255,0.5);
+    }
+</style>
