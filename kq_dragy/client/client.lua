@@ -110,11 +110,10 @@ Citizen.CreateThread(function()
                             SetDragyDistance(distance)
                         end
                     end
-
-                    if IsControlJustReleased(0, Keys['DOWN']) then
-                        RestartDragy()
-                    end
                 end
+            end
+            if IsControlJustReleased(0, Keys['DOWN']) then
+                RestartDragy()
             end
         end
 
