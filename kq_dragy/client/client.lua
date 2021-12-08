@@ -16,6 +16,7 @@ local units = 'km/h'
 local distanceUnits = 'm'
 
 local multiplier = 3.6
+local distanceMultiplier = 1
 
 local time0 = nil
 local startCoords = nil
@@ -24,6 +25,7 @@ if Config.useImperial then
     units = 'mph'
     distanceUnits = 'ft'
     multiplier = 2.236936
+    distanceMultiplier = 3.281
 end
 
 function ToggleDragy()
@@ -103,7 +105,7 @@ Citizen.CreateThread(function()
 
                     local distanceTravelled = GetDistanceBetweenCoords(startCoords, GetEntityCoords(playerPed))
                     for k, distance in pairs(Config.distances) do
-                        if distanceTravelled >= (distance.distance + 0.0) and distance.time == nil then
+                        if (distanceTravelled * distanceMultiplier) >= (distance.distance + 0.0) and distance.time == nil then
                             distance.time = GetGameTimer()
                             SetDragyDistance(distance)
                         end
