@@ -29,3 +29,17 @@ Config.times = {
         speed = 300,
     }
 }
+
+-- Distances that will be logged (this setup is recommended for metric units)
+-- I'd recommend distances like (1320, 2640, 5280) for imperial units
+Config.distances = {
+    {
+        distance = 500,
+    },
+    {
+        distance = 1000,
+    },
+    {
+        distance = 2000,
+    },
+}

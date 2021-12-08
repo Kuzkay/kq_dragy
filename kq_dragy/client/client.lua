@@ -13,12 +13,16 @@ local Keys = {
 local dragyShown = false
 
 local units = 'km/h'
+local distanceUnits = 'm'
+
 local multiplier = 3.6
 
 local time0 = nil
+local startCoords = nil
 
 if Config.useImperial then
     units = 'mph'
+    distanceUnits = 'ft'
     multiplier = 2.236936
 end
 
@@ -54,6 +58,15 @@ function SetDragyTime(time)
         })
     end
 end
+function SetDragyDistance(time)
+    if time0 then
+        SendNUIMessage({
+            event = "distance",
+            label = time.distance .. distanceUnits,
+            time = (time.time - time0) / 1000,
+        })
+    end
+end
 
 RegisterCommand('dragy', function(source, args)
     ToggleDragy()
@@ -77,6 +90,7 @@ Citizen.CreateThread(function()
                         })
                     end
                     time0 = GetGameTimer()
+                    startCoords = GetEntityCoords(playerPed)
                 end
 
                 if time0 then
@@ -86,6 +100,15 @@ Citizen.CreateThread(function()
                             SetDragyTime(time)
                         end
                     end
+
+                    local distanceTravelled = GetDistanceBetweenCoords(startCoords, GetEntityCoords(playerPed))
+                    for k, distance in pairs(Config.distances) do
+                        if distanceTravelled >= (distance.distance + 0.0) and distance.time == nil then
+                            distance.time = GetGameTimer()
+                            SetDragyDistance(distance)
+                        end
+                    end
+
                     if IsControlJustReleased(0, Keys['DOWN']) then
                         RestartDragy()
                     end

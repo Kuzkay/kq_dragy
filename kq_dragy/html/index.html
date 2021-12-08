@@ -46,6 +46,9 @@
             if (event.data.event === 'time') {
                 $('#times').append('<label class="time">0 - ' + event.data.label + ' - ' + event.data.time + 's</label>');
             }
+            if (event.data.event === 'distance') {
+                $('#times').append('<label class="time">' + event.data.label + ' - ' + event.data.time + 's</label>');
+            }
             if (event.data.event === 'reset') {
                 setReady(false);
                 reset();
