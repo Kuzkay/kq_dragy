@@ -45,9 +45,13 @@ function RestartDragy()
     })
 
     time0 = nil
-    startCoords = nil
     for k, time in pairs(Config.times) do
         time.time = nil
+    end
+
+    startCoords = nil
+    for k, distance in pairs(Config.distances) do
+        distance.time = nil
     end
 end
 
